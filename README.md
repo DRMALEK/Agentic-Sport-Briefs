@@ -260,28 +260,36 @@ UI Feedback (Knowledge Used card + pulse animations)
 - 📥 File downloads to device
 - ✅ Success message displays
 
+---
+
 ## 🤝 Contributing
 
-This is a demonstration project. To extend:
+### 🚀 How to Extend
 
-1. **Add Server Tools**: Edit `backend/tools.py`, add to `ToolRegistry`
-2. **Add Client Actions**: Edit `frontend/src/App.tsx`, handle in `handleClientActions`
-3. **Add Knowledge**: Use UI or seed in `backend/main.py`
-4. **Modify Agent Behavior**: Edit `backend/agent.py`
+| Feature | Edit | Details |
+|---------|------|---------|
+| **New Tools** | `backend/tools.py` | Add to `ToolRegistry` |
+| **UI Actions** | `frontend/src/App.tsx` | Handle in `handleClientActions` |
+| **Knowledge** | UI or `backend/main.py` | Add via UI or code seed |
+| **Agent Logic** | `backend/agent.py` | Modify planning/execution |
+
+This is a demonstration project - feel free to fork and customize!
+
+---
 
 ## 📝 License
 
-MIT License - feel free to use this as a template for your own agentic applications!
+MIT License - Use as a template for your own agentic applications!
 
 ## 🙏 Acknowledgments
 
 Built as a demonstration of:
-- Agentic AI application patterns
-- OpenAI function calling
-- React + FastAPI integration
-- Observable UI behaviors in AI apps
-- RAG knowledge integration
-- User approval flows in autonomous systems
+- ✅ Agentic AI application patterns
+- ✅ OpenAI function calling
+- ✅ React + FastAPI integration
+- ✅ Observable UI behaviors in AI apps
+- ✅ RAG knowledge integration
+- ✅ User approval flows in autonomous systems
 
 ---
 
