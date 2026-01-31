@@ -61,35 +61,6 @@ An agentic web application that helps users create comprehensive sports briefing
 3. Click "Approve" or "Reject"
 4. Check saved briefs sidebar for result
 
-## 🎯 What We Built and Why
-
-### The Challenge
-Create an end-to-end agentic web application that:
-- Accepts natural language goals
-- Creates and executes plans autonomously
-- Performs real server-side and client-side actions
-- Integrates knowledge to enhance responses
-- Requires user approval for certain actions
-- Shows clear activity traces
-
-### Our Solution: Sports Brief Builder
-A domain-focused application where an AI agent helps create sports briefings by:
-- Fetching live sports data
-- Searching a knowledge base
-- Generating statistics and analyses
-- Saving briefs to a database
-- Exporting documents
-- Updating the UI in real-time based on agent actions
-
-**Why Sports?** Sports data provides a perfect domain for demonstrating:
-- Real-time data fetching (scores, games)
-- Rich knowledge base (teams, players, rules)
-- Natural user requests ("Create a brief about NFL playoffs")
-- Observable UI updates (scoreboards, charts)
-- Document generation workflows
-
-## 🏗️ Architecture
-
 ### Tech Stack
 - **Frontend**: React 18 + TypeScript
 - **Backend**: FastAPI (Python 3.11)
