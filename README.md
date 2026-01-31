@@ -180,4 +180,4 @@ MIT License - Use as a template for your own agentic applications!
 
 **Built with ❤️ for demonstrating end-to-end agentic web applications**
 
-**See detailed documentation:** [API.md](API.md) | [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | [WEB_PROOF.md](WEB_PROOF.md)
+**See detailed documentation:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | [WEB_PROOF.md](WEB_PROOF.md)
