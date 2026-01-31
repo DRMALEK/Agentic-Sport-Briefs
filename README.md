@@ -107,12 +107,34 @@ bash test.sh
                         - export_brief
 ```
 
-## 🛠️ Server-Side Tools (5 Real Actions)
+## 🎯 Features
 
-### 1. `fetch_live_scores`
-**What it does**: Retrieves live sports scores and recent game results
-**Real work**: Queries sports data (simulated API with realistic data structure)
-**Example**: Returns game scores, status (Live/Final), dates
+### 🛠️ Server Tools (5 Actions)
+
+| Tool | Purpose | Details |
+|------|---------|---------|
+| **📊 fetch_live_scores** | Get live sports data | Returns game scores, status, dates |
+| **🔍 search_knowledge** | RAG search | SQL queries with relevance scoring |
+| **💾 save_brief** | Store briefs | Database persistence (⚠️ requires approval) |
+| **📈 generate_statistics** | Create analyses | Calculates stats, trends, predictions |
+| **📥 export_brief** | Download briefs | Markdown/TXT/JSON export (⚠️ requires approval) |
+
+### 🎨 Client-Side Actions (Observable Behaviors)
+
+| Action | Trigger | Effect |
+|--------|---------|--------|
+| **🏆 Scoreboard Widget** | `fetch_live_scores` call | Animated scores with gradient background |
+| **📊 Statistics Chart** | `generate_statistics` call | Animated bar charts (0.5s transition) |
+| **💡 Knowledge Pulse** | `search_knowledge` call | 3-second pulse animation on used items |
+| **📝 Activity Log** | Every agent action | Real-time updates with color-coded status |
+
+---
+
+## 📚 Tools & Actions
+
+### Detailed Tool Breakdown
+
+**📊 fetch_live_scores**
 ```python
 # Returns structured game data
 {
@@ -122,185 +144,121 @@ bash test.sh
 }
 ```
 
-### 2. `search_knowledge`
-**What it does**: RAG-like search through the knowledge base
-**Real work**: SQL queries with text matching, relevance scoring
-**Example**: Find information about teams, players, statistics
-**Knowledge influence**: Results are included in the agent's context
+**🔍 search_knowledge** - SQL queries with text matching and relevance scoring
 
-### 3. `save_brief`
-**What it does**: Persists sports briefs to the database
-**Real work**: SQLAlchemy ORM insert with metadata
-**Approval**: ✅ Requires user confirmation
-**Observable**: Updates brief count in UI, appears in saved briefs list
+**💾 save_brief** - SQLAlchemy ORM insert with metadata (requires approval)
 
-### 4. `generate_statistics`
-**What it does**: Creates statistical analyses and summaries
-**Real work**: Processes data types (player performance, team comparison, season summary)
-**Example**: Calculates averages, win rates, trends, predictions
-**Observable**: Triggers client-side chart visualization
+**📈 generate_statistics** - Processes player, team, and season data
 
-### 5. `export_brief`
-**What it does**: Exports briefs as downloadable files
-**Real work**: Formats data into Markdown/TXT/JSON, triggers browser download
-**Approval**: ✅ Requires user confirmation
-**Observable**: File download initiated in browser
+**📥 export_brief** - Generates Markdown/TXT/JSON downloads (requires approval)
 
-## 🎨 Client-Side Actions (3+ Observable Behaviors)
+---
 
-### 1. **Live Scoreboard Widget** 🏆
-**Trigger**: When `fetch_live_scores` tool is called
-**Behavior**: Animated scoreboard appears showing team names, scores, game status
-**Observable**: 
-- Component renders with gradient background
-- Smooth fade-in animation
-- Real-time score display
-- Game status (Live/Final) indicator
+## 💡 Knowledge System
 
-### 2. **Statistics Visualization Chart** 📊
-**Trigger**: When `generate_statistics` tool is called
-**Behavior**: Interactive bar chart displays with animated fills
-**Observable**:
-- Chart bars animate from 0 to target width (0.5s transition)
-- Color gradient fills (purple to blue)
-- Percentage/value labels
-- Responsive to different stat types (player, team, season)
+### 📚 How It Works
+1. **Storage**: SQLite table `knowledge` with 6 pre-loaded items
+2. **Search**: RAG-like text matching with relevance scoring
+3. **Enhancement**: Knowledge added to agent's system prompt
+4. **Feedback**: UI shows which knowledge items influenced response
 
-### 3. **Knowledge Highlight Pulse** 💡
-**Trigger**: When `search_knowledge` tool finds relevant items
-**Behavior**: Knowledge badges pulse with highlighting
-**Observable**:
-- 3-second pulse animation on used knowledge items
-- Color change to amber (indicates active use)
-- Clear visual feedback showing which knowledge influenced the response
-- Automatic return to normal state
-
-### 4. **Real-time Activity Log** 📝
-**Trigger**: Every agent action
-**Behavior**: Live-updating activity trace with status indicators
-**Observable**:
-- Color-coded status (green=success, red=failed, amber=in-progress)
-- Expandable result details
-- Approval requirement warnings
-- Fade-in animations for new activities
-
-## 📚 Knowledge System & RAG
-
-### Where Knowledge Lives
-1. **Database**: SQLite table `knowledge` stores all knowledge items
-2. **Initial Seed**: 6 pre-loaded items covering teams, players, stats, rules
-3. **User Additions**: Via UI form or file upload (.txt, .md)
-
-### How Knowledge is Used
+### 🎯 Knowledge Flow
 ```
-User Request → Agent receives goal
-     ↓
-Knowledge Search → Relevant items retrieved from DB
-     ↓
-Context Enhancement → Knowledge added to system prompt
-     ↓
-LLM Processing → Agent uses knowledge in planning/execution
-     ↓
-UI Feedback → "Knowledge Used" section shows which items influenced response
+User Request
+    ↓
+Knowledge Search (relevant items retrieved)
+    ↓
+Context Enhancement (added to system prompt)
+    ↓
+LLM Processing (agent uses knowledge)
+    ↓
+UI Feedback (Knowledge Used card + pulse animations)
 ```
 
-### Knowledge Influence Visibility
-The UI makes it **obvious** when knowledge is used:
-- **"Knowledge Used" Card**: Lists all knowledge items consulted
-- **Relevance Badges**: Shows high/medium relevance ratings
-- **Influence Banner**: Yellow alert explaining knowledge base impact
-- **Highlight Animation**: Knowledge items pulse when actively used
-- **Activity Log**: Shows `search_knowledge` tool execution details
+### 👤 Add Your Own Knowledge
+- **Via UI**: Click "Add Knowledge" → upload `.txt`/`.md` OR fill form
+- **Via File**: Create `.txt` or `.md` in `data/` directory
+- **Automatic**: Agent learns from your additions
 
-### Example Knowledge Influence
-```
-User: "Create a brief about NFL teams"
-Agent: 
-  1. Searches knowledge base for "NFL"
-  2. Finds "NFL Teams Overview" (high relevance)
-  3. Incorporates team info in response
-  4. UI shows: 📚 Knowledge Used: "NFL Teams Overview (high)"
-  5. Banner: "💡 Knowledge base was used to enhance this response..."
-```
+---
 
-## 🔒 Control & Safety
+## 🔒 Safety & Control
 
-### Approval Flow
-**Actions requiring approval:**
-- `save_brief` (writes to database)
-- `export_brief` (downloads file)
+### ⚠️ Approval Flow for Sensitive Actions
+
+**Actions requiring user approval:**
+- ✅ `save_brief` - Writes to database
+- ✅ `export_brief` - Downloads files
 
 **How it works:**
 1. Agent plans to execute sensitive action
-2. Activity log marks it "⚠️ Requires user approval"
-3. Modal dialog appears with action details
+2. Activity log marks: *"⚠️ Requires user approval"*
+3. **Approval Modal** appears with action details
 4. User reviews JSON payload
-5. User clicks "Approve" or "Reject"
+5. Click **Approve** ✅ or **Reject** ❌
 6. Action executes only if approved
 7. Confirmation message in chat
 
-**UI/UX:**
-- Large modal overlay (impossible to miss)
-- Clear action name and parameters
-- Formatted JSON preview
-- Two prominent buttons (Approve/Reject)
-- Color coding (green=approve, red=reject)
+**Safety Features:**
+- ✅ Delete operations are manual only (not auto)
+- ✅ All database writes require approval
+- ✅ Atomic database transactions
+- ✅ No automatic data loss scenarios
 
-### No Destructive Actions
-- Delete operations are manual (not agent-triggered)
-- All writes require approval
-- Database transactions are atomic
-- No automatic data loss scenarios
+---
 
-## 📖 Usage Examples
+## 📖 Examples
 
-### Example 1: Create a Sports Brief
-```
-User: "Create a comprehensive brief about the latest NFL playoff games"
+### Example 1: Create & Save a Brief 📋
 
-Agent:
-1. Creates plan (4 steps)
-2. Fetches live scores (Patriots vs Chiefs, etc.)
-3. Searches knowledge base for NFL info
-4. Generates brief content
-5. Requests approval to save
-6. Saves to database (after approval)
+**User Request:** *"Create a comprehensive brief about NFL playoff games"*
 
-UI Changes:
-- Scoreboard shows Patriots 24 - Chiefs 27
-- Knowledge badge pulses: "NFL Teams Overview"
-- Activity log shows 4 completed steps
-- Approval modal appears
-- Brief appears in sidebar after save
-```
+| Step | Action |
+|------|--------|
+| 1 | Creates execution plan (4 steps) |
+| 2 | Fetches live scores (Patriots vs Chiefs) |
+| 3 | Searches knowledge base for NFL info |
+| 4 | Generates brief content |
+| 5 | Requests user approval |
+| 6 | Saves to database (after approval) |
 
-### Example 2: Generate Statistics
-```
-User: "Show me player performance statistics"
+**Observable UI Changes:**
+- 🏆 Scoreboard shows Patriots 24 - Chiefs 27
+- 💡 Knowledge badge pulses: "NFL Teams Overview"
+- 📝 Activity log shows 4 completed steps
+- ⚠️ Approval modal appears
+- ✅ Brief appears in sidebar
 
-Agent:
-1. Calls generate_statistics tool
-2. Returns player stats (PPG, RPG, APG)
+### Example 2: Generate Statistics 📊
 
-UI Changes:
-- Statistics chart renders
-- Three animated bars show Points/Rebounds/Assists
-- Values fill from 0 to target (smooth animation)
-```
+**User Request:** *"Show me player performance statistics"*
 
-### Example 3: Export a Brief
-```
-User: "Export brief #1 as markdown"
+| Step | Action |
+|------|--------|
+| 1 | Calls `generate_statistics` tool |
+| 2 | Returns PPG, RPG, APG metrics |
 
-Agent:
-1. Calls export_brief tool
-2. Requests approval
+**Observable UI Changes:**
+- 📊 Statistics chart renders
+- 📈 Bars animate from 0 to target
+- 🎨 Color gradients fill (0.5s transition)
+- 📋 Percentage labels display
 
-UI Changes:
-- Approval modal shows export details
-- User approves
-- Browser downloads "brief_1.markdown"
-```
+### Example 3: Export a Brief 📥
+
+**User Request:** *"Export brief #1 as markdown"*
+
+| Step | Action |
+|------|--------|
+| 1 | Calls `export_brief` tool |
+| 2 | Requests user approval |
+| 3 | User clicks Approve ✅ |
+| 4 | Browser downloads file |
+
+**Observable UI Changes:**
+- ⚠️ Approval modal shows export details
+- 📥 File downloads to device
+- ✅ Success message displays
 
 ## 🤝 Contributing
 
