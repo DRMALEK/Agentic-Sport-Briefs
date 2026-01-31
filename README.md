@@ -11,13 +11,15 @@
 | [🚀 Quick Start](#quick-start) | Get up and running in 5 steps |
 | [🎯 Features](#features) | Server tools, client actions, knowledge system |
 | [🏗️ Architecture](#architecture) | Tech stack and system design |
-| [📚 Tools & Actions](#tools--actions) | Detailed breakdown of all capabilities |
+| [📚 Tools & Actions](#tools-actions) | Detailed breakdown of all capabilities |
 | [💡 Knowledge System](#knowledge-system) | How RAG works and adding knowledge |
-| [🔒 Safety & Control](#safety--control) | Approval flows and data protection |
+| [🔒 Safety & Control](#safety-control) | Approval flows and data protection |
 | [📖 Examples](#examples) | Real-world usage scenarios |
 | [🤝 Contributing](#contributing) | How to extend the project |
 
 ---
+
+<a id="quick-start"></a>
 
 ## 🚀 Quick Start
 
@@ -80,6 +82,8 @@ bash test.sh
 
 ---
 
+<a id="architecture"></a>
+
 ## 🏗️ Architecture
 
 ### 🔧 Tech Stack
@@ -108,6 +112,8 @@ bash test.sh
                         - export_brief
 ```
 
+<a id="features"></a>
+
 ## 🎯 Features
 
 ### 🛠️ Server Tools (5 Actions)
@@ -130,6 +136,8 @@ bash test.sh
 | **📝 Activity Log** | Every agent action | Real-time updates with color-coded status |
 
 ---
+
+<a id="tools-actions"></a>
 
 ## 📚 Tools & Actions
 
@@ -154,6 +162,8 @@ bash test.sh
 **📥 export_brief** - Generates Markdown/TXT/JSON downloads (requires approval)
 
 ---
+
+<a id="knowledge-system"></a>
 
 ## 💡 Knowledge System
 
@@ -183,6 +193,8 @@ UI Feedback (Knowledge Used card + pulse animations)
 
 ---
 
+<a id="safety-control"></a>
+
 ## 🔒 Safety & Control
 
 ### ⚠️ Approval Flow for Sensitive Actions
@@ -207,6 +219,8 @@ UI Feedback (Knowledge Used card + pulse animations)
 - ✅ No automatic data loss scenarios
 
 ---
+
+<a id="examples"></a>
 
 ## 📖 Examples
 
@@ -262,6 +276,8 @@ UI Feedback (Knowledge Used card + pulse animations)
 - ✅ Success message displays
 
 ---
+
+<a id="contributing"></a>
 
 ## 🤝 Contributing
 
