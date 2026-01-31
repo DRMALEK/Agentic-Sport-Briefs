@@ -8,13 +8,14 @@
 
 | Section | Description |
 |---------|-------------|
-| [🚀 Quick Start](#-quick-start) | Get up and running in 5 steps |
-| [🛠️ Features](#-features) | Server tools, client actions, knowledge system |
-| [🏗️ Architecture](#-architecture) | Tech stack and system design |
-| [📚 Tools & Actions](#-tools--actions) | Detailed breakdown of all capabilities |
-| [🔒 Safety & Control](#-safety--control) | Approval flows and data protection |
-| [📖 Examples](#-examples) | Real-world usage scenarios |
-| [🤝 Contributing](#-contributing) | How to extend the project |
+| [🚀 Quick Start](#quick-start) | Get up and running in 5 steps |
+| [🎯 Features](#features) | Server tools, client actions, knowledge system |
+| [🏗️ Architecture](#architecture) | Tech stack and system design |
+| [📚 Tools & Actions](#tools--actions) | Detailed breakdown of all capabilities |
+| [💡 Knowledge System](#knowledge-system) | How RAG works and adding knowledge |
+| [🔒 Safety & Control](#safety--control) | Approval flows and data protection |
+| [📖 Examples](#examples) | Real-world usage scenarios |
+| [🤝 Contributing](#contributing) | How to extend the project |
 
 ---
 
