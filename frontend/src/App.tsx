@@ -66,6 +66,40 @@ function App() {
     }
   };
 
+  const handleDeleteBrief = async (briefId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this brief?')) return;
+
+    try {
+      await briefsAPI.deleteBrief(briefId);
+      await loadBriefs();
+      await loadStats();
+      if (selectedBrief?.id === briefId) {
+        setShowBriefModal(false);
+        setSelectedBrief(null);
+      }
+    } catch (error) {
+      console.error('Failed to delete brief:', error);
+      alert('Failed to delete brief');
+    }
+  };
+
+  const handleDeleteAllBriefs = async () => {
+    if (briefs.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete all ${briefs.length} briefs? This action cannot be undone.`)) return;
+
+    try {
+      await briefsAPI.deleteAllBriefs();
+      await loadBriefs();
+      await loadStats();
+      setShowBriefModal(false);
+      setSelectedBrief(null);
+    } catch (error) {
+      console.error('Failed to delete all briefs:', error);
+      alert('Failed to delete all briefs');
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
@@ -278,7 +312,10 @@ function App() {
                                 }`}
                               >
                                 <div className="activity-header">
-                                  <span className="activity-action">{activity.action}</span>
+                                  <span className="activity-action">
+                                    {activity.action}
+                                    {activity.action.includes('tool') && msg.agentData?.tool_calls[i]?.tool && ` (${msg.agentData?.tool_calls[i]?.tool})`}
+                                  </span>
                                   <span className={`activity-status status-${activity.status}`}>
                                     {activity.status}
                                   </span>
@@ -302,22 +339,39 @@ function App() {
                         </div>
                       )}
 
+                      {/* Tools Called Summary */}
+                      {msg.agentData.tool_calls.length > 0 && (
+                        <div className="card">
+                          <h3 className="card-title">🔧 Tools Called</h3>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            {msg.agentData.tool_calls.map((toolCall, i) => (
+                              <div key={i} className="knowledge-badge" style={{ background: '#e0e7ff', color: '#3730a3' }}>
+                                {toolCall.tool}
+                                {toolCall.result.success ? ' ✓' : ' ✗'}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Knowledge Used Display */}
                       {msg.agentData.knowledge_used.length > 0 && (
                         <div className="card">
                           <h3 className="card-title">📚 Knowledge Used</h3>
-                          <div>
+                          <div style={{ marginBottom: '0.75rem' }}>
                             {msg.agentData.knowledge_used.map((k, i) => (
-                              <span key={i} className="knowledge-badge">
-                                {k.source} {k.relevance && `(${k.relevance})`}
-                              </span>
+                              <div key={i} style={{ marginBottom: '0.5rem' }}>
+                                <span className="knowledge-badge">
+                                  {k.source} {k.relevance && `(${k.relevance})`}
+                                </span>
+                                {k.influence && (
+                                  <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.25rem', marginLeft: '0.5rem' }}>
+                                    💡 {k.influence}
+                                  </div>
+                                )}
+                              </div>
                             ))}
                           </div>
-                          {msg.agentData.knowledge_used.some(k => k.influence) && (
-                            <div className="knowledge-influence">
-                              💡 Knowledge base was used to enhance this response with factual sports information
-                            </div>
-                          )}
                         </div>
                       )}
                     </>
@@ -425,27 +479,57 @@ function App() {
         <div className="sidebar">
           {/* Saved Briefs */}
           <div className="card">
-            <h3 className="card-title">📝 Saved Briefs</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 className="card-title" style={{ margin: 0 }}>📝 Saved Briefs</h3>
+              {briefs.length > 0 && (
+                <button
+                  className="btn btn-danger"
+                  onClick={handleDeleteAllBriefs}
+                  style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+                  title="Delete all briefs"
+                >
+                  🗑️ Delete All
+                </button>
+              )}
+            </div>
             <div className="briefs-list">
               {briefs.length === 0 ? (
                 <div className="empty-state">
                   <p>No briefs saved yet</p>
+                  <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '0.5rem' }}>Ask the agent to create and save briefs</p>
                 </div>
               ) : (
                 briefs.map(brief => (
                   <div
                     key={brief.id}
                     className="brief-item"
-                    onClick={() => {
-                      setSelectedBrief(brief);
-                      setShowBriefModal(true);
-                    }}
+                    style={{ position: 'relative' }}
                   >
-                    <div className="brief-title">{brief.title}</div>
-                    <div className="brief-meta">
-                      <span>{brief.category}</span>
-                      <span>{new Date(brief.created_at).toLocaleDateString()}</span>
+                    <div
+                      onClick={() => {
+                        setSelectedBrief(brief);
+                        setShowBriefModal(true);
+                      }}
+                      style={{ flex: 1, cursor: 'pointer' }}
+                    >
+                      <div className="brief-title">{brief.title}</div>
+                      <div className="brief-meta">
+                        <span>{brief.category}</span>
+                        <span>{new Date(brief.created_at).toLocaleDateString()}</span>
+                      </div>
                     </div>
+                    <button
+                      className="btn btn-danger"
+                      onClick={(e) => handleDeleteBrief(brief.id, e)}
+                      style={{ 
+                        fontSize: '0.75rem', 
+                        padding: '0.3rem 0.6rem',
+                        marginLeft: '0.5rem'
+                      }}
+                      title="Delete this brief"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 ))
               )}
@@ -541,6 +625,12 @@ function App() {
               </div>
             </div>
             <div className="modal-actions">
+              <button 
+                className="btn btn-danger" 
+                onClick={(e) => handleDeleteBrief(selectedBrief.id, e)}
+              >
+                🗑️ Delete
+              </button>
               <button className="btn btn-secondary" onClick={() => setShowBriefModal(false)}>
                 Close
               </button>

@@ -19,7 +19,7 @@ class Brief(Base):
     content = Column(Text)
     category = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
-    metadata = Column(JSON, nullable=True)
+    extra_data = Column(JSON, nullable=True)
 
 
 class Knowledge(Base):

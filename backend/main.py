@@ -90,6 +90,12 @@ class ApprovalRequest(BaseModel):
     approved: bool
 
 
+class BriefCreate(BaseModel):
+    title: str
+    content: str
+    category: str
+
+
 class KnowledgeCreate(BaseModel):
     title: str
     content: str
@@ -187,6 +193,27 @@ async def approve_action(request: ApprovalRequest, db: Session = Depends(get_db)
     }
 
 
+@app.post("/api/briefs")
+async def create_brief(brief: BriefCreate, db: Session = Depends(get_db)):
+    """Create a new brief"""
+    new_brief = Brief(
+        title=brief.title,
+        content=brief.content,
+        category=brief.category
+    )
+    db.add(new_brief)
+    db.commit()
+    db.refresh(new_brief)
+    
+    return {
+        "success": True,
+        "id": new_brief.id,
+        "title": new_brief.title,
+        "created_at": new_brief.created_at.isoformat(),
+        "message": "Brief created successfully"
+    }
+
+
 @app.get("/api/briefs")
 async def get_briefs(db: Session = Depends(get_db)):
     """Get all saved briefs"""
@@ -232,6 +259,16 @@ async def delete_brief(brief_id: int, db: Session = Depends(get_db)):
     db.commit()
     
     return {"success": True, "message": "Brief deleted"}
+
+
+@app.delete("/api/briefs")
+async def delete_all_briefs(db: Session = Depends(get_db)):
+    """Delete all briefs"""
+    count = db.query(Brief).count()
+    db.query(Brief).delete()
+    db.commit()
+    
+    return {"success": True, "message": f"Deleted {count} briefs"}
 
 
 @app.get("/api/knowledge")

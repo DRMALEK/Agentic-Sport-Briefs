@@ -395,13 +395,14 @@
   margin-bottom: 0.5rem;
   background: #f9fafb;
   border-radius: 6px;
-  cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .brief-item:hover {
   background: #f3f4f6;
-  transform: translateX(5px);
 }
 
 .brief-title {

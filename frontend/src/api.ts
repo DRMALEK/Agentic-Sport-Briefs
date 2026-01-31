@@ -76,8 +76,14 @@ export const briefsAPI = {
   getBrief: (id: number): Promise<Brief> =>
     api.get(`/api/briefs/${id}`).then(res => res.data),
   
+  createBrief: (brief: { title: string; content: string; category: string }) =>
+    api.post('/api/briefs', brief).then(res => res.data),
+  
   deleteBrief: (id: number) =>
     api.delete(`/api/briefs/${id}`).then(res => res.data),
+  
+  deleteAllBriefs: () =>
+    api.delete('/api/briefs').then(res => res.data),
 };
 
 export const knowledgeAPI = {

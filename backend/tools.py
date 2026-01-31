@@ -114,21 +114,29 @@ class ToolRegistry:
                 "type": "function",
                 "function": {
                     "name": "export_brief",
-                    "description": "Export a brief as a downloadable file. REQUIRES USER APPROVAL.",
+                    "description": "Export content as a formatted file (markdown, txt, or json). Use this to export generated briefs or content without saving to database. REQUIRES USER APPROVAL.",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "brief_id": {
-                                "type": "integer",
-                                "description": "ID of the brief to export",
+                            "title": {
+                                "type": "string",
+                                "description": "Title of the content to export",
+                            },
+                            "content": {
+                                "type": "string",
+                                "description": "The main content to export",
+                            },
+                            "category": {
+                                "type": "string",
+                                "description": "Category of the content (e.g., football, basketball, general)",
                             },
                             "format": {
                                 "type": "string",
-                                "description": "Export format (markdown, txt, json)",
+                                "description": "Export format: 'markdown' for .md files, 'txt' for plain text, or 'json' for JSON format",
                                 "enum": ["markdown", "txt", "json"],
                             },
                         },
-                        "required": ["brief_id", "format"],
+                        "required": ["title", "content", "format"],
                     },
                 }
             },
@@ -204,7 +212,7 @@ class ToolRegistry:
             title=title,
             content=content,
             category=category,
-            metadata={"created_by": "agent", "version": "1.0"}
+            extra_data={"created_by": "agent", "version": "1.0"}
         )
         self.db.add(brief)
         self.db.commit()
@@ -220,6 +228,10 @@ class ToolRegistry:
     
     async def generate_statistics(self, data_type: str, parameters: Optional[Dict] = None) -> Dict[str, Any]:
         """Tool 4: Generate statistical analysis"""
+        # Ensure parameters is a dict, not None
+        if parameters is None:
+            parameters = {}
+        
         # Mock statistics generation
         stats = {}
         
@@ -265,33 +277,58 @@ class ToolRegistry:
             "statistics": stats,
         }
     
-    async def export_brief(self, brief_id: int, format: str) -> Dict[str, Any]:
-        """Tool 5: Export brief (requires approval)"""
-        brief = self.db.query(Brief).filter(Brief.id == brief_id).first()
-        
-        if not brief:
-            return {"success": False, "error": "Brief not found"}
+    async def export_brief(self, title: str, content: str, format: str, category: str = "general") -> Dict[str, Any]:
+        """Tool 5: Export content in various formats (requires approval)"""
         
         export_data = {
-            "title": brief.title,
-            "content": brief.content,
-            "category": brief.category,
-            "created_at": brief.created_at.isoformat(),
+            "title": title,
+            "content": content,
+            "category": category,
+            "created_at": datetime.utcnow().isoformat(),
         }
         
+        # Format the content based on requested format
         if format == "json":
-            content = json.dumps(export_data, indent=2)
+            formatted_content = json.dumps(export_data, indent=2)
+            file_ext = "json"
         elif format == "markdown":
-            content = f"# {export_data['title']}\n\n**Category:** {export_data['category']}\n**Created:** {export_data['created_at']}\n\n{export_data['content']}"
-        else:  # txt
-            content = f"{export_data['title']}\n{'='*len(export_data['title'])}\n\nCategory: {export_data['category']}\nCreated: {export_data['created_at']}\n\n{export_data['content']}"
+            formatted_content = f"""# {export_data['title']}
+
+**Category:** {export_data['category']}  
+**Created:** {export_data['created_at']}
+
+---
+
+{export_data['content']}
+"""
+            file_ext = "md"
+        elif format == "txt":
+            title_underline = '=' * len(export_data['title'])
+            formatted_content = f"""{export_data['title']}
+{title_underline}
+
+Category: {export_data['category']}
+Created: {export_data['created_at']}
+
+{export_data['content']}
+"""
+            file_ext = "txt"
+        else:
+            return {
+                "success": False,
+                "error": f"Unsupported format '{format}'. Please use 'markdown', 'txt', or 'json'."
+            }
+        
+        # Generate a safe filename from the title
+        safe_title = title.lower().replace(' ', '_').replace('/', '_')[:50]
         
         return {
             "success": True,
-            "brief_id": brief_id,
+            "title": title,
             "format": format,
-            "filename": f"brief_{brief_id}.{format}",
-            "content": content,
+            "filename": f"{safe_title}.{file_ext}",
+            "content": formatted_content,
+            "message": f"Content '{title}' exported successfully as {format}",
         }
     
     async def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:

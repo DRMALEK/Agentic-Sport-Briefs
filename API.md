@@ -117,6 +117,40 @@ Approve or reject an action requiring user approval.
 
 ### Briefs Management
 
+#### POST `/api/briefs`
+Create a new brief.
+
+**Request Body:**
+```json
+{
+  "title": "NFL Playoff Preview",
+  "content": "The NFL playoffs are heating up with the top teams competing...",
+  "category": "football"
+}
+```
+
+**Parameters:**
+- `title` (string, required): Brief title
+- `content` (string, required): Brief content
+- `category` (string, required): Category (e.g., football, basketball, soccer)
+
+**Response:**
+```json
+{
+  "success": true,
+  "id": 1,
+  "title": "NFL Playoff Preview",
+  "created_at": "2026-01-30T10:30:00",
+  "message": "Brief created successfully"
+}
+```
+
+**Status Codes:**
+- 200: Success
+- 422: Validation error
+
+---
+
 #### GET `/api/briefs`
 Get all saved briefs.
 

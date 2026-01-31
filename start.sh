@@ -37,7 +37,7 @@ echo "🐳 Starting Docker containers..."
 echo ""
 
 # Build and start containers
-docker-compose up --build
+docker compose up --build
 
 echo ""
 echo "🎉 Application is ready!"

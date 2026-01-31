@@ -167,6 +167,8 @@ Always be helpful, accurate, and concise. Use the knowledge base to enhance your
         
         # Determine which knowledge was used
         knowledge_used = []
+        knowledge_sources_used = []
+        
         if knowledge_context:
             knowledge_used.append({
                 "source": "knowledge_base",
@@ -177,11 +179,16 @@ Always be helpful, accurate, and concise. Use the knowledge base to enhance your
             if tool_call["tool"] == "search_knowledge":
                 results = tool_call["result"].get("results", [])
                 for r in results:
-                    knowledge_used.append({
+                    knowledge_sources_used.append({
                         "source": r.get("title", "Knowledge item"),
                         "category": r.get("category", "general"),
                         "relevance": r.get("relevance", "medium"),
+                        "influence": f"Enhanced response with {r.get('title', 'knowledge')} ({r.get('relevance', 'medium')} relevance)",
                     })
+        
+        # Combine knowledge - prioritize specific search results, then general knowledge base
+        if knowledge_sources_used:
+            knowledge_used = knowledge_sources_used + knowledge_used
         
         return {
             "success": True,
