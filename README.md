@@ -1,74 +1,96 @@
-# Sports Brief Builder 🏆
+# 🏆 Sports Brief Builder
 
-An agentic web application that helps users create comprehensive sports briefings, reports, and analyses through natural language interaction. The agent creates execution plans, takes observable actions on both server and client, and requires approval for sensitive operations.
+> An agentic web application that creates comprehensive sports briefings through natural language. The agent builds plans, fetches live data, searches knowledge, and requires user approval for sensitive actions.
 
-## ⚡ Quick Start
+---
 
-### First Time Setup
+## 📑 Table of Contents
 
-1. **Get your OpenAI API key:**
-   - Go to https://platform.openai.com/api-keys
-   - Create a new secret key and copy it
+| Section | Description |
+|---------|-------------|
+| [🚀 Quick Start](#-quick-start) | Get up and running in 5 steps |
+| [🛠️ Features](#-features) | Server tools, client actions, knowledge system |
+| [🏗️ Architecture](#-architecture) | Tech stack and system design |
+| [📚 Tools & Actions](#-tools--actions) | Detailed breakdown of all capabilities |
+| [🔒 Safety & Control](#-safety--control) | Approval flows and data protection |
+| [📖 Examples](#-examples) | Real-world usage scenarios |
+| [🤝 Contributing](#-contributing) | How to extend the project |
 
-2. **Configure the environment:**
-   ```bash
-   cd /home/malek/SportradarEx
-   cp .env.example .env
-   nano .env  # Replace with your actual OpenAI API key
-   ```
+---
 
-3. **Start the application:**
-   ```bash
-   bash start.sh
-   ```
-   The script will validate your configuration and start Docker containers.
+## 🚀 Quick Start
 
-4. **Open your browser:**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
+### ⚙️ Setup (5 minutes)
 
-5. **Test the application:**
-   ```bash
-   bash test.sh
-   ```
-   This verifies that all services and endpoints are working correctly.
+**Step 1: Get OpenAI API Key**
+- Visit https://platform.openai.com/api-keys
+- Create a new secret key
 
-### Troubleshooting
+**Step 2: Configure Environment**
+```bash
+cd /home/malek/SportradarEx
+cp .env.example .env
+nano .env  # Add your OpenAI API key
+```
 
-| Issue | Solution |
-|-------|----------|
-| Port already in use | `docker-compose down` or change ports in docker-compose.yml |
-| OpenAI API Error | Check API key in .env, verify credits and internet connection |
+**Step 3: Start Application**
+```bash
+bash start.sh
+```
+
+**Step 4: Open in Browser**
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:8000
+- **API Docs:** http://localhost:8000/docs
+
+**Step 5: Verify Installation**
+```bash
+bash test.sh
+```
+
+### 🎯 Try These Prompts
+| Prompt | What It Does |
+|--------|-------------|
+| "Create a brief about the latest NFL games" | Fetches scores & generates analysis |
+| "Show me latest football scores" | Live sports data with visualization |
+| "Generate player performance statistics" | Creates animated stat charts |
+| "Tell me about NBA teams" | Searches knowledge base |
+| "Create a brief and save it" | Full workflow with approval |
+
+### 📚 Add Your Knowledge
+1. Click "Add Knowledge" in the UI
+2. Upload `.txt` or `.md` file (or fill form manually)
+3. Agent now has access to your knowledge
+
+### ✅ Test Approval Flow
+1. Type: *"Create a brief about NFL and save it to database"*
+2. Review action in **Approval Modal**
+3. Click **Approve** or **Reject**
+4. Check **Saved Briefs** sidebar for result
+
+### ❌ Troubleshooting
+
+| ⚠️ Issue | ✅ Solution |
+|---------|---------|
+| Port already in use | `docker-compose down` |
+| OpenAI API Error | Check API key, verify credits |
 | Frontend won't load | `docker-compose up --build frontend` |
 | Database issues | `rm -rf data/*.db && docker-compose restart backend` |
 
-### Example Prompts to Try
-- **Briefs**: "Create a brief about the latest NFL games"
-- **Live Data**: "Show me latest football scores"
-- **Statistics**: "Generate player performance statistics"
-- **Knowledge**: "Tell me about NBA teams using the knowledge base"
-- **Workflows**: "Create a comprehensive NFL playoff brief and save it"
+---
 
-### Adding Your Own Knowledge
-1. Click "Add Knowledge" in Knowledge Base card
-2. Upload a .txt or .md file OR fill the form manually
-3. Agent will have access to this knowledge
+## 🏗️ Architecture
 
-### Testing Approval Flow
-1. Type: "Create a brief about NFL and save it to database"
-2. Review action in approval modal
-3. Click "Approve" or "Reject"
-4. Check saved briefs sidebar for result
+### 🔧 Tech Stack
+| Component | Technology |
+|-----------|-----------|
+| **Frontend** | React 18 + TypeScript |
+| **Backend** | FastAPI (Python 3.11) |
+| **Database** | SQLite |
+| **LLM** | OpenAI GPT-4 Turbo |
+| **Deployment** | Docker + Docker Compose |
 
-### Tech Stack
-- **Frontend**: React 18 + TypeScript
-- **Backend**: FastAPI (Python 3.11)
-- **Database**: SQLite
-- **LLM**: OpenAI GPT-4 Turbo
-- **Containerization**: Docker + Docker Compose
-
-### System Design
+### 📊 System Design
 ```
 ┌─────────────┐         ┌──────────────┐         ┌─────────────┐
 │   React UI  │ ◄────► │  FastAPI     │ ◄────► │  SQLite DB  │
@@ -81,7 +103,7 @@ An agentic web application that helps users create comprehensive sports briefing
  - Scoreboard           - fetch_live_scores
  - Charts               - search_knowledge
  - Highlights           - save_brief
-                        - generate_statistics
+ - Activity Log         - generate_statistics
                         - export_brief
 ```
 
