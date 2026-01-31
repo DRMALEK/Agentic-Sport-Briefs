@@ -2,6 +2,65 @@
 
 An agentic web application that helps users create comprehensive sports briefings, reports, and analyses through natural language interaction. The agent creates execution plans, takes observable actions on both server and client, and requires approval for sensitive operations.
 
+## ⚡ Quick Start
+
+### First Time Setup
+
+1. **Get your OpenAI API key:**
+   - Go to https://platform.openai.com/api-keys
+   - Create a new secret key and copy it
+
+2. **Configure the environment:**
+   ```bash
+   cd /home/malek/SportradarEx
+   cp .env.example .env
+   nano .env  # Replace with your actual OpenAI API key
+   ```
+
+3. **Start the application:**
+   ```bash
+   bash start.sh
+   ```
+   The script will validate your configuration and start Docker containers.
+
+4. **Open your browser:**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+   - API Docs: http://localhost:8000/docs
+
+5. **Test the application:**
+   ```bash
+   bash test.sh
+   ```
+   This verifies that all services and endpoints are working correctly.
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Port already in use | `docker-compose down` or change ports in docker-compose.yml |
+| OpenAI API Error | Check API key in .env, verify credits and internet connection |
+| Frontend won't load | `docker-compose up --build frontend` |
+| Database issues | `rm -rf data/*.db && docker-compose restart backend` |
+
+### Example Prompts to Try
+- **Briefs**: "Create a brief about the latest NFL games"
+- **Live Data**: "Show me latest football scores"
+- **Statistics**: "Generate player performance statistics"
+- **Knowledge**: "Tell me about NBA teams using the knowledge base"
+- **Workflows**: "Create a comprehensive NFL playoff brief and save it"
+
+### Adding Your Own Knowledge
+1. Click "Add Knowledge" in Knowledge Base card
+2. Upload a .txt or .md file OR fill the form manually
+3. Agent will have access to this knowledge
+
+### Testing Approval Flow
+1. Type: "Create a brief about NFL and save it to database"
+2. Review action in approval modal
+3. Click "Approve" or "Reject"
+4. Check saved briefs sidebar for result
+
 ## 🎯 What We Built and Why
 
 ### The Challenge
@@ -200,135 +259,6 @@ Agent:
 - Database transactions are atomic
 - No automatic data loss scenarios
 
-## 🌐 Web Proof
-
-### Evidence of Real Web Behavior
-
-#### 1. Network Requests (DevTools Evidence)
-Open browser DevTools → Network tab while using the app:
-
-**POST** `/api/agent/execute`
-```json
-Request:
-{
-  "goal": "Show me latest NFL scores",
-  "use_knowledge": true
-}
-
-Response: 200 OK
-{
-  "success": true,
-  "plan": { ... },
-  "tool_calls": [
-    {
-      "tool": "fetch_live_scores",
-      "result": { "games": [...], "success": true }
-    }
-  ]
-}
-```
-
-**GET** `/api/briefs`
-```json
-Response: 200 OK
-{
-  "briefs": [
-    {
-      "id": 1,
-      "title": "NFL Playoff Preview",
-      "category": "football",
-      "created_at": "2026-01-30T..."
-    }
-  ]
-}
-```
-
-**POST** `/api/knowledge/upload`
-```
-Request: FormData with file
-Response: { "success": true, "id": 7 }
-```
-
-#### 2. Server Tool Execution
-**Console output** when agent runs:
-```
-INFO: Agent executing plan for: "Create NFL brief"
-INFO: Tool called: fetch_live_scores(sport='football')
-INFO: Tool result: {"success": true, "games": 3}
-INFO: Tool called: search_knowledge(query='NFL')
-INFO: Tool result: {"success": true, "results": 2}
-INFO: Tool called: save_brief(title='NFL Brief')
-INFO: Database write: Brief #5 created
-```
-
-#### 3. UI Changes as Result
-**Observable sequence:**
-1. User types message → clicks "Send"
-2. **Network**: POST to `/api/agent/execute` (visible in DevTools)
-3. **Server**: Agent executes tools (logs show tool calls)
-4. **UI Changes**:
-   - Loading indicator appears
-   - Agent response message fades in
-   - **Scoreboard widget renders** (client action)
-   - **Activity log updates** with color-coded steps
-   - **Knowledge badges pulse** (highlight animation)
-   - **Stats chart animates** (bars fill from left to right)
-   - Brief count increments in header
-   - New brief appears in sidebar list
-
-**Screenshot Key Moments:**
-- Before: Empty chat, stats show "0 Briefs"
-- Network: Request/response in DevTools
-- After: Message, scoreboard, chart, stats show "1 Brief"
-
-## 🚀 How to Run
-
-### Prerequisites
-- Docker & Docker Compose
-- OpenAI API key
-
-### One-Command Setup
-
-1. **Clone and navigate:**
-```bash
-cd /home/malek/SportradarEx
-```
-
-2. **Set your OpenAI API key:**
-```bash
-cp .env.example .env
-nano .env  # Add your OPENAI_API_KEY
-```
-
-3. **Run everything:**
-```bash
-docker-compose up --build
-```
-
-4. **Access the application:**
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-
-### Without Docker (Development)
-
-**Backend:**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-export OPENAI_API_KEY=your_key_here
-uvicorn main:app --reload
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm install
-npm start
-```
-
 ## 📖 Usage Examples
 
 ### Example 1: Create a Sports Brief
@@ -378,169 +308,6 @@ UI Changes:
 - User approves
 - Browser downloads "brief_1.markdown"
 ```
-
-## 🎯 Key Features Checklist
-
-### Core Requirements
-- ✅ End-to-end functionality (chat → plan → execution → results)
-- ✅ Clear client/server split
-- ✅ Agent accepts natural language goals
-- ✅ Lightweight plan creation and display
-- ✅ Activity log/trace (what agent did, status, results)
-
-### Server-Side Tools (3+ required)
-- ✅ `fetch_live_scores` - Real sports data fetching
-- ✅ `search_knowledge` - RAG database search
-- ✅ `save_brief` - Database persistence
-- ✅ `generate_statistics` - Data transformation
-- ✅ `export_brief` - File generation & download
-
-### Client-Side Actions (2+ required)
-- ✅ Scoreboard widget update (observable UI state)
-- ✅ Statistics chart rendering (observable visualization)
-- ✅ Knowledge highlight pulse (observable animation)
-- ✅ Activity log updates (beyond text rendering)
-
-### Knowledge System
-- ✅ Knowledge database with seeded data
-- ✅ File upload capability (.txt, .md)
-- ✅ RAG-like search integration
-- ✅ **Clear UI indication of knowledge influence**:
-  - Knowledge Used card
-  - Highlighted badges with pulse animation
-  - Influence explanation banner
-  - Activity log showing search execution
-
-### Control & Safety
-- ✅ User approval modal for sensitive actions
-- ✅ No destructive actions without confirmation
-- ✅ Clear action preview before approval
-
-### Frontend
-- ✅ Conversation interface
-- ✅ Agent plan display
-- ✅ Activity trace/log
-- ✅ Results/artifacts (saved briefs)
-- ✅ Real-time UI updates
-
-## 🔄 Tradeoffs & Design Decisions
-
-### What We Chose
-
-#### 1. **Simulated Sports API vs Real API**
-**Choice**: Simulated data with realistic structure
-**Why**: 
-- No API key management complexity
-- Predictable demo behavior
-- Fast responses
-- Easy to extend with more data
-**Tradeoff**: Not truly "live" scores
-**Production path**: Replace with ESPN/Sportradar API
-
-#### 2. **Simple Text Search vs Vector Embeddings**
-**Choice**: SQL LIKE queries for knowledge search
-**Why**:
-- No additional dependencies (no vector DB)
-- Instant setup
-- Good enough for demo size knowledge base
-- Clear to understand
-**Tradeoff**: Less sophisticated relevance
-**Production path**: Add pgvector or Pinecone
-
-#### 3. **Single Model vs Multi-Agent**
-**Choice**: Single GPT-4 call with function calling
-**Why**:
-- Simpler architecture
-- Lower latency
-- Easier to trace
-- Cost-effective
-**Tradeoff**: Less specialized behavior
-**Production path**: Add specialized agents per domain
-
-#### 4. **Synchronous Tool Execution**
-**Choice**: Sequential tool execution in agent loop
-**Why**:
-- Predictable order
-- Easier debugging
-- Clear activity log
-**Tradeoff**: Slower for many tools
-**Production path**: Parallel execution where possible
-
-### What We Prioritized
-
-✅ **End-to-end completeness** over depth in one area
-✅ **Observable behavior** over background processing
-✅ **Clear UI feedback** over advanced AI capabilities
-✅ **Approval flow** over full automation
-✅ **Development speed** over production optimization
-
-## 🚧 Next Steps & Improvements
-
-### Short Term
-1. **Real Sports API Integration**
-   - ESPN API or Sportradar
-   - Live score streaming
-   - Historical data access
-
-2. **Enhanced Knowledge System**
-   - Vector embeddings (OpenAI text-embedding-3)
-   - Semantic similarity search
-   - Auto-categorization of uploads
-
-3. **Richer Client Actions**
-   - Interactive game timeline
-   - Player comparison tables
-   - Season progression graphs
-   - Team formation visualizations
-
-### Medium Term
-4. **Multi-Agent Architecture**
-   - Specialist agent for statistics
-   - Writer agent for briefs
-   - Research agent for knowledge
-
-5. **Streaming Responses**
-   - SSE for real-time updates
-   - Progressive plan revelation
-   - Live activity log updates
-
-6. **Enhanced Approval System**
-   - Approval history
-   - Undo/rollback functionality
-   - Bulk approval for similar actions
-
-### Long Term
-7. **User Accounts & Personalization**
-   - Save preferences
-   - Favorite teams
-   - Custom knowledge bases
-
-8. **Collaboration Features**
-   - Share briefs
-   - Team workspaces
-   - Comment threads
-
-9. **Advanced Analytics**
-   - Brief quality scoring
-   - Usage patterns
-   - Agent performance metrics
-
-## 📊 Project Statistics
-
-- **Backend**: 
-  - 4 Python files (~800 lines)
-  - 5 server tools
-  - SQLite with 3 tables
-  - RESTful API (11 endpoints)
-
-- **Frontend**:
-  - React + TypeScript
-  - 1 main component (~600 lines)
-  - 3+ observable client actions
-  - Responsive design
-
-- **Total Setup Time**: ~10 minutes with Docker
-- **Total Code**: ~1,500 lines (excluding deps)
 
 ## 🤝 Contributing
 
