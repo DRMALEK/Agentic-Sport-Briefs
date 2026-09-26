@@ -68,11 +68,30 @@ flowchart LR
 4. **Open the browser:** http://localhost:3000
 
 ### Try These Prompts
-- "Create a brief about the latest NFL games"
-- "Show me latest football scores"
-- "Generate player performance statistics"
+
+**Best showcase of the agent** — one goal that needs planning, several tools, and human approval:
+
+> "Build me a pre-game brief on the Lakers vs Celtics rivalry. Get the latest scores and standings, pull in what our knowledge base says about both teams, add a short statistical comparison, and write it up as a one-page brief. Save it to the database and also export it as Markdown."
+
+What you should see:
+1. **Plan:** a 3-5 step plan appears in the activity log.
+2. **Tool chain:** the agent calls `espn_*` tools (live scores/standings via MCP), `search_knowledge`, and `generate_statistics` on its own, choosing the order and arguments.
+3. **Scoreboard and chart:** the scoreboard widget and statistics chart update, and used knowledge items pulse.
+4. **Approval gate:** `save_brief` and `export_brief` pause for your approval before anything is written.
+5. **Synthesis:** a final brief that combines live data, knowledge base facts and statistics.
+
+**More agentic prompts**
+- "Compare how the top two teams in the NBA standings are doing this week, and tell me which one looks stronger and why." *(live data → comparison → reasoning)*
+- "Check today's NFL scoreboard, find the closest game, then give me the latest news and a quick summary of that matchup." *(the second call depends on the result of the first)*
+- "What do we already know about the Warriors? If the knowledge base is thin, fill the gaps with live data and save a short brief." *(conditional decision-making)*
+- "Write a brief about tonight's games, then reject the save and see what the agent does." *(tests the approval flow)*
+
+
+**Simple prompts** (single tool)
+- "Show me the latest football scores"
 - "Tell me about NBA teams using the knowledge base"
-- "Create a brief and save it to database" *(tests approval flow)*
+
+> `generate_statistics` currently returns sample data, so numbers from it are illustrative. Live scores, standings and news come from the ESPN MCP server and need `APIFY_TOKEN`.
 
 ---
 
@@ -107,6 +126,7 @@ Browse free, tool-capable models: https://openrouter.ai/models?supported_paramet
 The backend connects to the server over MCP and discovers its tools at the start of each request (cached for 5 minutes), so whatever the server offers is available to the agent. At the time of writing these include `espn_scoreboard`, `espn_live_scoreboard`, `espn_standings`, `espn_teams`, `espn_team_roster`, `espn_team_schedule`, `espn_news`, `espn_game_summary`, `espn_game_odds`, `espn_athletes`, `espn_rankings`, `espn_search` and `espn_play_by_play`. None of them require approval.
 
 The old mocked `fetch_live_scores` tool was removed. If the MCP server is unreachable or `APIFY_TOKEN` is missing, the agent is told live data is unavailable and does not invent scores.
+
 ### 🎨 Client Actions (Observable UI Changes)
 
 | Action | Trigger | Observable Behavior |
@@ -129,16 +149,14 @@ The old mocked `fetch_live_scores` tool was removed. If the MCP server is unreac
 
 ## Next Steps
 
-- Real sports API integration (ESPN/Sportradar)
 - Vector embeddings for semantic search (e.g. via OpenRouter embeddings)
-- Streaming responses via SSE
 - Multi-agent architecture (specialist agents per domain)
 - Approval history and undo functionality
 - Rich client visualizations (timelines, formation diagrams)
 - User accounts and personalization
 - Collaboration features (share briefs, comments)
 - Advanced analytics on agent performance
-- AWS Deployement
+- Cloud Deployement (AWS)
 
 ---
 
