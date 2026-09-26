@@ -4,7 +4,6 @@
 
 ---
 
-
 ## 📑 Table of Contents
 
 | Section | Description |
@@ -70,24 +69,6 @@ Sports data provides an ideal domain for demonstrating:
 1. **Database:** SQLite table `knowledge` (6 pre-loaded items: teams, players, rules, stats)
 2. **User Additions:** Via UI upload (.txt/.md files) or manual form input
 3. **No Vector DB:** Uses SQL LIKE queries for text matching and basic relevance scoring
-
-### How It's Used
-```
-User Request → Knowledge Search → Relevant items retrieved from DB
-     ↓
-Context Enhancement → Knowledge added to agent's system prompt
-     ↓
-Agent Uses Knowledge → LLM generates response informed by knowledge
-     ↓
-UI Feedback → "Knowledge Used" card shows which items influenced response
-```
-
-**Visibility:** The UI makes knowledge influence obvious through:
-- Knowledge Used card with relevance badges (high/medium/low)
-- Pulse animations on knowledge items when actively used
-- Activity log showing `search_knowledge` execution details
-- Influence banner explaining knowledge impact
-
 ---
 
 ## How to Run
@@ -123,50 +104,17 @@ UI Feedback → "Knowledge Used" card shows which items influenced response
 
 ### Architecture
 ```
-React UI (TypeScript) ←→ FastAPI (Python) ←→ SQLite DB
-     ↓                          ↓
-Client Actions           Server Tools
-- Scoreboard            - fetch_live_scores
-- Charts                - search_knowledge
-- Animations            - save_brief
-                        - generate_statistics
-                        - export_brief
+
 ```
-
----
-
-## Tradeoffs and Next Steps
-
-### Design Decisions
-
-| Choice | Why | Tradeoff | Production Path |
-|--------|-----|----------|-----------------|
-| **Simulated Sports API** | No API key complexity, predictable demos | Not truly "live" data | Replace with ESPN/Sportradar API |
-| **SQL LIKE Search** | No extra dependencies, instant setup | Less sophisticated relevance | Add pgvector or Pinecone embeddings |
-| **Single GPT-4 Call** | Simple architecture, low latency | Less specialized behavior | Multi-agent system (planner/executor/writer) |
-| **Synchronous Tools** | Predictable order, easier debugging | Slower for many tools | Parallel execution where safe |
-| **SQLite** | Zero setup, embedded database | Limited concurrency | PostgreSQL for production |
-
-### What We Prioritized
-✅ **End-to-end completeness** over depth in one area  
-✅ **Observable behavior** over background processing  
-✅ **Clear UI feedback** over advanced AI capabilities  
-✅ **User approval** over full automation  
-✅ **Development speed** over production optimization  
-
 ### Next Steps
 
 **Short Term:**
 - Real sports API integration (ESPN/Sportradar)
 - Vector embeddings for semantic search (OpenAI text-embedding-3)
 - Streaming responses via SSE
-
-**Medium Term:**
 - Multi-agent architecture (specialist agents per domain)
 - Approval history and undo functionality
 - Rich client visualizations (timelines, formation diagrams)
-
-**Long Term:**
 - User accounts and personalization
 - Collaboration features (share briefs, comments)
 - Advanced analytics on agent performance
