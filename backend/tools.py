@@ -1,9 +1,13 @@
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 import json
+import logging
 import httpx
 from sqlalchemy.orm import Session
 from database import Brief, Knowledge
+from mcp_client import ESPNMCPClient, get_espn_tools
+
+logger = logging.getLogger(__name__)
 
 
 class ToolRegistry:
@@ -12,37 +16,32 @@ class ToolRegistry:
     def __init__(self, db: Session):
         self.db = db
         self.tools = {
-            "fetch_live_scores": self.fetch_live_scores,
             "search_knowledge": self.search_knowledge,
             "save_brief": self.save_brief,
             "generate_statistics": self.generate_statistics,
             "export_brief": self.export_brief,
         }
+        # Live sports data comes from the ESPN MCP server (Apify); tools are discovered at runtime
+        self.mcp = ESPNMCPClient()
+        self.mcp_definitions: List[Dict[str, Any]] = []
+        self.mcp_error: Optional[str] = None
+    
+    async def load_mcp_tools(self) -> None:
+        """Discover ESPN MCP tools. Failures are non-fatal: local tools keep working."""
+        self.mcp_definitions = []
+        self.mcp_error = None
+        if not self.mcp.enabled:
+            self.mcp_error = "APIFY_TOKEN is not set"
+            return
+        try:
+            self.mcp_definitions = await get_espn_tools(self.mcp)
+        except Exception as e:
+            self.mcp_error = f"Could not reach ESPN MCP server: {e}"
+            logger.warning(self.mcp_error)
     
     def get_tool_definitions(self) -> List[Dict[str, Any]]:
-        """Return OpenAI function calling format tool definitions"""
-        return [
-            {
-                "type": "function",
-                "function": {
-                    "name": "fetch_live_scores",
-                    "description": "Fetch live sports scores and recent game results for specified sports or teams",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "sport": {
-                                "type": "string",
-                                "description": "Type of sport (football, basketball, soccer, etc.)",
-                            },
-                            "team": {
-                                "type": "string",
-                                "description": "Optional: specific team name to filter results",
-                            },
-                        },
-                        "required": ["sport"],
-                    },
-                }
-            },
+        """Return OpenAI function calling format tool definitions (local + ESPN MCP)"""
+        return self.mcp_definitions + [
             {
                 "type": "function",
                 "function": {
@@ -141,38 +140,6 @@ class ToolRegistry:
                 }
             },
         ]
-    
-    async def fetch_live_scores(self, sport: str, team: Optional[str] = None) -> Dict[str, Any]:
-        """Tool 1: Fetch live sports scores"""
-        # Simulated API response (in production, would call real sports API like ESPN, Sportradar, etc.)
-        mock_data = {
-            "football": [
-                {"home": "Patriots", "away": "Chiefs", "home_score": 24, "away_score": 27, "status": "Final", "date": "2026-01-29"},
-                {"home": "Cowboys", "away": "49ers", "home_score": 21, "away_score": 31, "status": "Final", "date": "2026-01-29"},
-                {"home": "Bills", "away": "Ravens", "home_score": 28, "away_score": 24, "status": "Live - Q4", "date": "2026-01-30"},
-            ],
-            "basketball": [
-                {"home": "Lakers", "away": "Celtics", "home_score": 112, "away_score": 108, "status": "Final", "date": "2026-01-29"},
-                {"home": "Warriors", "away": "Nets", "home_score": 98, "away_score": 105, "status": "Live - Q3", "date": "2026-01-30"},
-            ],
-            "soccer": [
-                {"home": "Manchester United", "away": "Liverpool", "home_score": 2, "away_score": 2, "status": "Final", "date": "2026-01-29"},
-                {"home": "Barcelona", "away": "Real Madrid", "home_score": 3, "away_score": 1, "status": "Final", "date": "2026-01-29"},
-            ],
-        }
-        
-        games = mock_data.get(sport.lower(), [])
-        
-        if team:
-            games = [g for g in games if team.lower() in g["home"].lower() or team.lower() in g["away"].lower()]
-        
-        return {
-            "success": True,
-            "sport": sport,
-            "team_filter": team,
-            "games": games,
-            "total_games": len(games),
-        }
     
     async def search_knowledge(self, query: str, category: Optional[str] = None) -> Dict[str, Any]:
         """Tool 2: Search knowledge base with RAG-like functionality"""
@@ -333,6 +300,13 @@ Created: {export_data['created_at']}
     
     async def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a tool by name with given arguments"""
+        mcp_names = {d["function"]["name"] for d in self.mcp_definitions}
+        if tool_name in mcp_names:
+            try:
+                return await self.mcp.call_tool(tool_name, arguments)
+            except Exception as e:
+                return {"success": False, "source": "espn-mcp", "error": str(e)}
+        
         if tool_name not in self.tools:
             return {"success": False, "error": f"Tool '{tool_name}' not found"}
         

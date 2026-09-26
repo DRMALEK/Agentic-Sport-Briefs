@@ -27,6 +27,11 @@ if [ "$OPENROUTER_API_KEY" == "your_openrouter_api_key_here" ] || [ -z "$OPENROU
     exit 1
 fi
 
+if [ -z "$APIFY_TOKEN" ] || [ "$APIFY_TOKEN" == "your_apify_token_here" ]; then
+    echo "⚠️  APIFY_TOKEN not set - live ESPN data will be unavailable (the rest of the app still works)."
+    echo ""
+fi
+
 echo "✅ Configuration validated"
 echo ""
 

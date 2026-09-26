@@ -157,11 +157,11 @@ function App() {
   const handleClientActions = (response: AgentResponse) => {
     response.tool_calls.forEach(toolCall => {
       // Action 1: Update scoreboard from live scores
-      if (toolCall.tool === 'fetch_live_scores' && toolCall.result.success) {
+      if (toolCall.tool.startsWith('espn_') && toolCall.result.success) {
         const games = toolCall.result.games;
         if (games && games.length > 0) {
           // Show first live or recent game
-          const liveGame = games.find((g: any) => g.status.includes('Live')) || games[0];
+          const liveGame = games.find((g: any) => String(g.status).includes('Live')) || games[0];
           setScoreboard(liveGame);
         }
       }

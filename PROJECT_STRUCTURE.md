@@ -18,7 +18,8 @@ SportradarEx/
 │   ├── requirements.txt         # Python dependencies
 │   ├── main.py                  # FastAPI application entry point
 │   ├── agent.py                 # Agent logic and planning
-│   ├── tools.py                 # Server-side tools (5 tools)
+│   ├── tools.py                 # Server-side tools (4 local + ESPN MCP tools)
+│   ├── mcp_client.py            # ESPN MCP client (Apify mrbridge/espn-mcp-server)
 │   └── database.py              # SQLAlchemy models and DB setup
 │
 ├── frontend/                     # React Frontend
@@ -88,14 +89,19 @@ SportradarEx/
 - Activity logging
 - Knowledge context integration
 
+**mcp_client.py**
+- MCP client (streamable HTTP) for `mrbridge/espn-mcp-server` on Apify
+- Converts MCP tool schemas to OpenAI function-calling format
+- Normalises scoreboard output for the UI scoreboard widget
+
 **tools.py** (200+ lines)
 - ToolRegistry class
-- 5 server-side tools:
-  1. `fetch_live_scores` - Get sports data
-  2. `search_knowledge` - RAG search
-  3. `save_brief` - Database persistence
-  4. `generate_statistics` - Data analysis
-  5. `export_brief` - File export
+- 4 local server-side tools:
+  1. `search_knowledge` - RAG search
+  2. `save_brief` - Database persistence
+  3. `generate_statistics` - Data analysis
+  4. `export_brief` - File export
+- Live sports data: `espn_*` tools discovered at runtime from the ESPN MCP server and routed through `mcp_client.py`
 - OpenAI function calling format
 
 **database.py** (80+ lines)
@@ -270,6 +276,8 @@ Grand Total:  ~3,960 lines (excluding dependencies)
 - **Environment**:
   - OPENROUTER_API_KEY
   - OPENROUTER_MODEL (optional)
+  - APIFY_TOKEN (live ESPN data via MCP)
+  - ESPN_MCP_URL (optional)
   - DATABASE_URL
 - **Command**: `uvicorn main:app --reload`
 
@@ -334,8 +342,8 @@ Grand Total:  ~3,960 lines (excluding dependencies)
 - ✅ Activity log/trace
 - ✅ Error handling
 
-### Server-Side Tools (5/5)
-- ✅ fetch_live_scores (sports data)
+### Server-Side Tools (4 local + ESPN MCP)
+- ✅ espn_* tools via MCP (live sports data, replaces the former mocked fetch_live_scores)
 - ✅ search_knowledge (RAG)
 - ✅ save_brief (database)
 - ✅ generate_statistics (analysis)

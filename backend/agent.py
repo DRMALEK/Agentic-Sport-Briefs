@@ -25,7 +25,7 @@ class Agent:
         base_prompt = """You are a Sports Brief Builder Agent. Your role is to help users create comprehensive sports briefings, reports, and analyses.
 
 You have access to the following capabilities:
-1. Fetch live sports scores and recent game results
+1. Fetch live scores, standings, schedules, rosters, news and player stats from ESPN (espn_* tools)
 2. Search a knowledge base for teams, players, statistics, and sports facts
 3. Save briefs to the database
 4. Generate statistical analyses
@@ -38,6 +38,11 @@ When given a task:
 4. For save_brief and export_brief actions, inform the user that approval is required
 
 Always be helpful, accurate, and concise. Use the knowledge base to enhance your responses with factual information."""
+        
+        if self.tools.mcp_definitions:
+            base_prompt += "\n\nFor any live or recent sports data use the espn_* tools. Never invent scores or stats."
+        else:
+            base_prompt += f"\n\nLive sports data tools are UNAVAILABLE ({self.tools.mcp_error}). Tell the user live data cannot be fetched and never invent scores or stats."
         
         if knowledge_context:
             base_prompt += f"\n\nRELEVANT KNOWLEDGE CONTEXT:\n{knowledge_context}\n\nUse this knowledge to provide accurate and detailed information in your response."
@@ -80,6 +85,9 @@ Always be helpful, accurate, and concise. Use the knowledge base to enhance your
         """Execute the plan to achieve user's goal"""
         
         self.activity_log = []
+        
+        # Discover ESPN MCP tools before building the system prompt
+        await self.tools.load_mcp_tools()
         
         # Initialize conversation with system prompt and history
         messages = [

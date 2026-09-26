@@ -13,6 +13,8 @@ services:
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-openai/gpt-oss-20b:free}
+      - APIFY_TOKEN=${APIFY_TOKEN}
+      - ESPN_MCP_URL=${ESPN_MCP_URL:-https://mrbridge--espn-mcp-server.apify.actor/mcp}
       - DATABASE_URL=sqlite:///./data/sports_brief.db
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     networks:
