@@ -5,11 +5,17 @@ import os
 from tools import ToolRegistry
 
 
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_MODEL = "openai/gpt-oss-20b:free"
+
+
 class Agent:
     """Agentic system that plans and executes tasks"""
     
-    def __init__(self, db_session, openai_api_key: str):
-        self.client = OpenAI(api_key=openai_api_key)
+    def __init__(self, db_session, api_key: str, model: Optional[str] = None):
+        # OpenRouter exposes an OpenAI-compatible API, so the OpenAI SDK works with a custom base_url
+        self.client = OpenAI(api_key=api_key, base_url=OPENROUTER_BASE_URL)
+        self.model = model or DEFAULT_MODEL
         self.tools = ToolRegistry(db_session)
         self.conversation_history = []
         self.activity_log = []
@@ -47,7 +53,7 @@ Always be helpful, accurate, and concise. Use the knowledge base to enhance your
         ]
         
         response = self.client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model=self.model,
             messages=messages,
             temperature=0.7,
         )
@@ -109,7 +115,7 @@ Always be helpful, accurate, and concise. Use the knowledge base to enhance your
             iteration += 1
             
             response = self.client.chat.completions.create(
-                model="gpt-4-turbo-preview",
+                model=self.model,
                 messages=current_messages,
                 tools=self.tools.get_tool_definitions(),
                 tool_choice="auto",

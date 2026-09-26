@@ -83,7 +83,7 @@ SportradarEx/
 
 **agent.py** (150+ lines)
 - Agent class with planning logic
-- OpenAI integration
+- OpenRouter integration (OpenAI-compatible API)
 - Tool execution orchestration
 - Activity logging
 - Knowledge context integration
@@ -221,7 +221,7 @@ User sees result
 - **Language**: Python 3.11
 - **ORM**: SQLAlchemy 2.0
 - **Server**: Uvicorn 0.27
-- **AI**: OpenAI 1.10
+- **AI**: OpenRouter via OpenAI SDK 1.10
 
 ### Data Layer
 - **Database**: SQLite 3
@@ -268,7 +268,8 @@ Grand Total:  ~3,960 lines (excluding dependencies)
   - `./backend:/app` (code)
   - `./data:/app/data` (database)
 - **Environment**:
-  - OPENAI_API_KEY
+  - OPENROUTER_API_KEY
+  - OPENROUTER_MODEL (optional)
   - DATABASE_URL
 - **Command**: `uvicorn main:app --reload`
 

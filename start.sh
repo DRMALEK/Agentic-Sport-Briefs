@@ -11,17 +11,17 @@ if [ ! -f .env ]; then
     echo "📝 Creating .env from template..."
     cp .env.example .env
     echo ""
-    echo "⚙️  Please edit .env and add your OpenAI API key:"
+    echo "⚙️  Please edit .env and add your OpenRouter API key:"
     echo "   nano .env"
     echo ""
     echo "Then run this script again."
     exit 1
 fi
 
-# Check if OPENAI_API_KEY is set
+# Check if OPENROUTER_API_KEY is set
 source .env
-if [ "$OPENAI_API_KEY" == "your_openai_api_key_here" ] || [ -z "$OPENAI_API_KEY" ]; then
-    echo "⚠️  OpenAI API key not configured!"
+if [ "$OPENROUTER_API_KEY" == "your_openrouter_api_key_here" ] || [ -z "$OPENROUTER_API_KEY" ]; then
+    echo "⚠️  OpenRouter API key not configured!"
     echo "📝 Please edit .env and add your API key:"
     echo "   nano .env"
     exit 1

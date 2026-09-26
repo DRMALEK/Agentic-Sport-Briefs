@@ -122,9 +122,9 @@ async def root():
 async def execute_agent(request: AgentRequest, db: Session = Depends(get_db)):
     """Execute agent with user goal"""
     
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    if not openai_api_key:
-        raise HTTPException(status_code=500, detail="OpenAI API key not configured")
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OpenRouter API key not configured")
     
     # Get or create session
     session_id = request.session_id or str(uuid.uuid4())
@@ -150,7 +150,7 @@ async def execute_agent(request: AgentRequest, db: Session = Depends(get_db)):
             ])
     
     # Execute agent
-    agent = Agent(db, openai_api_key)
+    agent = Agent(db, api_key, os.getenv("OPENROUTER_MODEL"))
     result = await agent.execute_plan(
         user_goal=request.goal,
         knowledge_context=knowledge_context,

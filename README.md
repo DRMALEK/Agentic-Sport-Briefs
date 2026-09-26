@@ -2,46 +2,92 @@
 
 > An agentic web application that creates sports briefings through natural language. The agent builds plans, executes tools, and requires user approval for sensitive actions.
 
+**Tech Stack:** React + TypeScript, FastAPI + Python 3.11, SQLite, OpenRouter (free models supported), Docker
+
 ---
 
 ## 📑 Table of Contents
 
-| Section | Description |
-|---------|-------------|
-| [What & Why](#what-and-why) | Project overview and purpose |
-| [Tools & Actions](#tools-and-actions) | Server tools and client behaviors |
-| [Knowledge System](#knowledge-system) | Where knowledge lives and how it's used |
-| [How to Run](#how-to-run) | Setup and testing |
-| [Tradeoffs & Next Steps](#tradeoffs-and-next-steps) | Design decisions and improvements |
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Tools and Actions](#tools-and-actions)
+- [Knowledge System](#knowledge-system)
+- [Next Steps](#next-steps)
+- [License](#license)
 
 ---
 
-## What and Why
+## Architecture
 
-### What We Built
-An end-to-end agentic application where an AI agent:
-- Accepts natural language goals
-- Creates execution plans autonomously
-- Executes real server-side and client-side actions
-- Searches a knowledge base (RAG)
-- Requires user approval for sensitive operations
-- Shows clear activity traces
+```mermaid
+flowchart LR
+    User([User]) --> FE["Frontend<br/>React + TypeScript<br/>:3000"]
+    FE -- "REST /api" --> BE["Backend<br/>FastAPI<br/>:8000"]
+    BE --> Agent["Agent<br/>plan → tool loop → answer"]
+    Agent -- "chat + tool calls" --> LLM["OpenRouter<br/>(free models)"]
+    Agent --> Tools["Tool Registry<br/>scores · knowledge · stats<br/>save · export"]
+    Tools --> DB[("SQLite<br/>briefs · knowledge<br/>conversations")]
+    BE --> DB
+    FE -. "approval for save / export" .-> User
+```
 
-### Why Sports?
-Sports data provides an ideal domain for demonstrating:
-- **Real-time data**: Live scores and game results
-- **Rich knowledge**: Teams, players, rules, statistics
-- **Natural requests**: "Create a brief about NFL playoffs"
-- **Observable UI**: Scoreboards, charts, animations
-- **Document workflows**: Brief creation, editing, exporting
+1. The frontend sends the user's goal to the FastAPI backend.
+2. The agent asks the LLM (via OpenRouter) for a plan, then loops: the model requests tools, the backend executes them, and the results go back to the model.
+3. `save_brief` and `export_brief` are flagged as needing user approval in the UI.
+4. The final answer, tool calls and activity log are returned to the frontend.
 
-**Tech Stack:** React + TypeScript, FastAPI + Python 3.11, SQLite, OpenAI GPT-4 Turbo, Docker
+---
+
+## Quick Start
+
+### Prerequisites
+- **Docker** (Docker Desktop on Windows/macOS, or Docker Engine with the Compose plugin on Linux) — install from https://docs.docker.com/get-docker/ and make sure it is running.
+- **OpenRouter API key** (free) — get one at https://openrouter.ai/keys
+
+### Steps
+
+1. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   nano .env  # Add your OpenRouter API key
+   ```
+
+2. **Start the application:**
+   ```bash
+   bash start.sh
+   ```
+
+3. **Test it works (optional):**
+   ```bash
+   bash test.sh
+   ```
+
+4. **Open the browser:** http://localhost:3000
+
+### Try These Prompts
+- "Create a brief about the latest NFL games"
+- "Show me latest football scores"
+- "Generate player performance statistics"
+- "Tell me about NBA teams using the knowledge base"
+- "Create a brief and save it to database" *(tests approval flow)*
+
+---
+
+## Configuration
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `OPENROUTER_API_KEY` | Yes | — | Your OpenRouter API key |
+| `OPENROUTER_MODEL` | No | `openai/gpt-oss-20b:free` | Any OpenRouter model that supports tool calling |
+
+Browse free, tool-capable models: https://openrouter.ai/models?supported_parameters=tools&max_price=0
 
 ---
 
 ## Tools and Actions
 
-### 🛠️ Server Tools (5 Real Actions)
+### 🛠️ Server Tools
 
 | Tool | What It Does | Approval Required |
 |------|-------------|-------------------|
@@ -65,52 +111,16 @@ Sports data provides an ideal domain for demonstrating:
 
 ## Knowledge System
 
-### Where Knowledge Lives
 1. **Database:** SQLite table `knowledge` (6 pre-loaded items: teams, players, rules, stats)
-2. **User Additions:** Via UI upload (.txt/.md files) or manual form input
-3. **No Vector DB:** Uses SQL LIKE queries for text matching and basic relevance scoring
+2. **User additions:** Via UI upload (.txt/.md files) or manual form input
+3. **No vector DB:** Uses SQL LIKE queries for text matching and basic relevance scoring
+
 ---
 
-## How to Run
+## Next Steps
 
-### Quick Start (5 minutes)
-
-1. **Get OpenAI API key** from https://platform.openai.com/api-keys
-
-2. **Configure environment:**
-   ```bash
-   cp .env.example .env
-   nano .env  # Add your OpenAI API key
-   ```
-
-3. **Start application:**
-   ```bash
-   bash start.sh
-   ```
-
-4. **Test it works:**
-   ```bash
-   bash test.sh
-   ```
-
-5. **Open browser:** http://localhost:3000
-
-### Try These Prompts
-- "Create a brief about the latest NFL games"
-- "Show me latest football scores"
-- "Generate player performance statistics"
-- "Tell me about NBA teams using the knowledge base"
-- "Create a brief and save it to database" *(tests approval flow)*
-
-### Architecture
-```
-
-```
-### Next Steps
-
-**Short Term:**
 - Real sports API integration (ESPN/Sportradar)
-- Vector embeddings for semantic search (OpenAI text-embedding-3)
+- Vector embeddings for semantic search (e.g. via OpenRouter embeddings)
 - Streaming responses via SSE
 - Multi-agent architecture (specialist agents per domain)
 - Approval history and undo functionality
@@ -121,12 +131,8 @@ Sports data provides an ideal domain for demonstrating:
 
 ---
 
-## 📝 License
+## License
 
 MIT License - Use as a template for your own agentic applications!
 
----
-
-**Built with ❤️ for demonstrating end-to-end agentic web applications**
-
-**See detailed documentation:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | [WEB_PROOF.md](WEB_PROOF.md)
+**More documentation:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | [WEB_PROOF.md](WEB_PROOF.md)
