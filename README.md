@@ -1,4 +1,4 @@
-# 🏆 Sports Brief Builder
+# 🏆 Sport Briefs Builder
 
 > An agentic web application that creates sports briefings through natural language. The agent builds plans, executes tools, and requires user approval for sensitive actions.
 
